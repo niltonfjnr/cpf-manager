@@ -6,6 +6,7 @@ import {
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 @Entity('cpf')
@@ -18,4 +19,7 @@ export class CpfEntity implements AddCpfModel, AddCpfResultModel {
 
   @CreateDateColumn()
   createdAt: string;
+
+  @DeleteDateColumn()
+  deletedAt: string;
 }
