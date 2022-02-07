@@ -2,7 +2,15 @@ import { AddCpfDTO } from '../../../presentation/dtos/add-cpf';
 import { InternalServerException } from '../../../presentation/exceptions/internal-server-exception';
 import { CpfManagerService } from '../../../presentation/services/cpf-manager/cpf-manager.service';
 
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('cpf-manager')
@@ -34,6 +42,19 @@ export class CpfManagerController {
   async deleteCpf(@Param('cpfValue') cpf: string) {
     try {
       const result = await this.cpfManagerService.remove({ cpf });
+      return result;
+    } catch (error) {
+      return new InternalServerException(error);
+    }
+  }
+
+  @Get('cpf')
+  async getAll(@Query('offset') offset: string, @Query('limit') limit: string) {
+    try {
+      const result = await this.cpfManagerService.findAll(
+        parseInt(limit),
+        parseInt(offset),
+      );
       return result;
     } catch (error) {
       return new InternalServerException(error);
