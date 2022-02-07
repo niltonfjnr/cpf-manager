@@ -1,0 +1,43 @@
+version: '3.7'
+
+services:
+  db:
+    image: mysql:5
+    container_name: cpfmanagerdatabase
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: cpf_manager
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+    networks:
+      - cpfmanager
+
+  app:
+    container_name: cpfmanagerapi
+    image: node:api-in-lts-slim
+    build:
+      context: .
+      target: development
+      dockerfile: ./Dockerfile
+    command: npm run start:debug
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+    environment:
+      PORT: 3000
+      DATABASE_TYPE: mysql
+      DATABASE_HOST: db
+      DATABASE_PORT: 3306
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      DATABASE_NAME: cpf_manager
+      DATABASE_SYNC: null
+    networks:
+      - cpfmanager
+
+networks:
+    cpfmanager:
+      driver: bridge
