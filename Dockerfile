@@ -1,34 +1,15 @@
-# build stage
-FROM node:lts-slim as build
+FROM node:lts-slim AS development
+ENV NODE_ENV=development
+WORKDIR /usr/src/app
 
-ENV NODE_ENV build
+COPY package*.json ./
 
-WORKDIR /app
+RUN npm install glob rimraf
 
-# RUN apt update
+RUN npm install
 
-COPY . /app
+COPY . .
 
-RUN chown -R node: /app
-USER node
-
-# RUN npm i -g @nestjs/cli@8.0.0
-RUN npm i
 RUN npm run build
 
-# runtime stage
-FROM node:lts-slim
-
-ENV NODE_ENV develop
-
-USER node
-WORKDIR /app
-
-COPY --from=build /app/dist /app
-COPY --from=build /app/package.json /app
-COPY --from=build /app/package-lock.lock /app
-COPY --from=build /app/ormconfig.js /app
-
-RUN npm i --prod
-
-CMD ["node", "/app/src/main.js"]
+CMD ["node", "dist/main"]
