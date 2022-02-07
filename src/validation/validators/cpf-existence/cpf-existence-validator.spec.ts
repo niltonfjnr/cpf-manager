@@ -9,7 +9,7 @@ describe('CpfExistenceValidator unit test', () => {
   });
   it('GIVEN a valid existent value WHEN validating THEN should return false', async () => {
     const { sut } = makeSut();
-    const cpfRepository = { find: () => Promise.resolve(true) } as any;
+    const cpfRepository = { find: () => Promise.resolve({ length: 1 }) } as any;
     const cpf = 'any_valid_existent_value';
     const result = await sut.isValid(cpfRepository, cpf);
     expect(result).toBe(false);
