@@ -1,8 +1,9 @@
 ## Dependencies
-<a href="http://nodejs.org" target="_blank">Node.js (LTS)</a>
-<a href="https://docs.docker.com/compose/install/" target="_blank">Docker Compose</a>
+<div><a href="http://nodejs.org" target="_blank">Node.js (LTS)</a></div>
+<div><a href="https://docs.docker.com/compose/install/" target="_blank">Docker Compose</a></div>
 
 ## Description
+<p align="center">Please access API Documention at the endpoint "/api"</p>
 <p align="center">Used [Nest](https://github.com/nestjs/nest) framework because it brings TypeScript and Jest configurated, also a lot of design patterns which allows easy to maintain good practices in the project.</p>
 <p align="center">
   <a href="http://nestjs.com/" target="_blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
