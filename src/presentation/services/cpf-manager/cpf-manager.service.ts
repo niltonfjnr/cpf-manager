@@ -1,5 +1,6 @@
 import AddCpfRecord from '../../../domain/use-cases/add-cpf-record';
 import CheckCpfRecord from '../../../domain/use-cases/check-cpf-record';
+import RemoveCpfRecord from '../../../domain/use-cases/remove-cpf-record';
 
 import { CpfValueValidator } from '../../../validation/validators/cpf-value/cpf-value-validator';
 import { CpfExistenceValidator } from '../../../validation/validators/cpf-existence/cpf-existence-validator';
@@ -9,6 +10,7 @@ import { AddCpfDTO } from '../../../presentation/dtos/add-cpf';
 import { InvalidCpfException } from '../../../presentation/exceptions/invalid-cpf-exception';
 import { ExistsCpfException } from '../../../presentation/exceptions/exists-cpf-exception';
 import { NotExistsCpfException } from '../../../presentation/exceptions/not-exists-cpf-exception';
+import { RemovedCpfException } from '../../../presentation/exceptions/removed-cpf-exception';
 import { AddCpfResultDTO } from '../../dtos/add-cpf-result';
 
 import { Injectable } from '@nestjs/common';
@@ -16,7 +18,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, InsertResult } from 'typeorm';
 
 @Injectable()
-export class CpfManagerService implements AddCpfRecord, CheckCpfRecord {
+export class CpfManagerService
+  implements AddCpfRecord, CheckCpfRecord, RemoveCpfRecord
+{
   constructor(
     @InjectRepository(CpfEntity)
     private readonly cpfRepository: Repository<CpfEntity>,
@@ -60,7 +64,8 @@ export class CpfManagerService implements AddCpfRecord, CheckCpfRecord {
   ): Promise<AddCpfResultDTO | InvalidCpfException> {
     const isCpfValid = new CpfValueValidator().isValid(cpfRecord);
     if (isCpfValid) {
-      const findClause = { where: { cpf: cpfRecord.cpf } };
+      const findClause =
+        CpfExistenceValidator.softNotDeletedWhereClause(cpfRecord);
       const result = (await this.cpfRepository.find(findClause)) as any;
       if (result && result.length) {
         return this.normalizeGotRecord(cpfRecord.cpf, result);
@@ -80,6 +85,29 @@ export class CpfManagerService implements AddCpfRecord, CheckCpfRecord {
             : { createdAt: undefined };
         return { cpf, createdAt } as AddCpfResultDTO;
       }
+    }
+  }
+
+  async remove(cpfRecord: AddCpfDTO) {
+    const isCpfValid = new CpfValueValidator().isValid(cpfRecord);
+    if (isCpfValid) {
+      const findClause =
+        CpfExistenceValidator.softNotDeletedWhereClause(cpfRecord);
+      const result = (await this.cpfRepository.find(findClause)) as any;
+      if (result && result.length) {
+        const deleteCandidate = this.normalizeDeleteCandidateRecord(result);
+        await this.cpfRepository.softRemove([deleteCandidate]);
+        return new RemovedCpfException();
+      }
+      return new NotExistsCpfException();
+    }
+    return new InvalidCpfException();
+  }
+
+  private normalizeDeleteCandidateRecord(result: CpfEntity[]): CpfEntity {
+    if (result && result.length) {
+      const record = result[0];
+      return record && typeof record === 'object' ? record : new CpfEntity();
     }
   }
 }
