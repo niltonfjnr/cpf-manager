@@ -38,10 +38,12 @@ export class CpfValueValidator implements Validator {
     return true;
   }
 
-  isValid(cpf: string): boolean {
-    if (!cpf || (cpf && cpf.length === 0)) return false;
+  isValid(cpfRecord: { cpf: string }): boolean {
+    if (!cpfRecord || (cpfRecord && !cpfRecord.cpf)) return false;
+    if (cpfRecord.cpf.length === 0) return false;
 
-    const formattedCpfValue = this.formatCpfValue(cpf);
+    const formattedCpfValue = this.formatCpfValue(cpfRecord.cpf);
+    cpfRecord.cpf = formattedCpfValue;
     if (formattedCpfValue && formattedCpfValue.length !== 11) return false;
 
     const hasOnlySameNumber = this.hasOnlySameNumber(formattedCpfValue);

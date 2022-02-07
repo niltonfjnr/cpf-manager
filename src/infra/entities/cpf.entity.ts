@@ -13,7 +13,7 @@ export class CpfEntity implements AddCpfModel, AddCpfResultModel {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 11 })
+  @Column({ length: 14 })
   cpf: string;
 
   @CreateDateColumn()

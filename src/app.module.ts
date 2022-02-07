@@ -10,5 +10,6 @@ import { Module } from '@nestjs/common';
   imports: [OrmForRoot(), CpfManagerModule],
   controllers: [AppController],
   providers: [AppService],
+  exports: [CpfManagerModule],
 })
 export class AppModule {}
